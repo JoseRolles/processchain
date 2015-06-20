@@ -66,6 +66,7 @@ Chain.start();
 
 # ProcessChain Methods
 
+#### push
 ```javascript
 ProcessChain.push(function handler, integer index, object options)
 ```
@@ -77,11 +78,13 @@ This method pushes an anonymous function to be executed when the chain execution
 | integer | index | (Optional) An integer index of where to insert the handler into the chain. A false boolean is passed by default denoting that the handler will be appended to the end of the chain. Please note that an integer longer than the current queue will cause the push to simply append the handler to the end of the queue. |
 | object | options | (Optional) A JavaScript object that can be used to store information to this current push. |
 
+#### first
 ```javascript
 ProcessChain.first(function handler, integer index, object options);
 ```
 This is the same with ProcessChain.push method except that it resets the ProccessChain to the initial state before pushing the handler into the chain. This gurantees that the chain is empty if the chain has been used before. This is similar to executing ProcessChain.reset and then ProcessChain.push.
 
+#### wait
 ```javascript
 ProcessChain.wait(integer index, object options);
 ```
@@ -92,29 +95,35 @@ This method appends a wait to the process chain queue. Use this after a single o
 | integer | index | (Optional) An integer index of where to insert the wait into the chain. A false boolean is passed by default denoting that the handler will be appended to the end of the chain. Please note that an integer longer than the current queue will cause the wait to be simply appended to the end of the queue. |
 | object | options | (Optional) A JavaScript object that can be used to store information to this current wait. |
 
+#### final
 ```javascript
 ProcessChain.final(function handler);
 ```
 This method sets the final anonymous function that will be executed when all uncompleted flags set has been cleared.
+
 | Parameters |     |     |
 | ---------- | --- | --- |
 | function | handler | (Required) An anonymous function that will be passed the dataSore from the currentProcess object.
 
+#### start
 ```javascript
 ProcessChain.start();
 ```
 This method starts and executes the anonymous functions in the chain in order, respecting uncompleted flags and waits.
 
+#### stop
 ```javascript
 ProcessChain.stop();
 ```
 This method stops the chain at whichever anonymous handler it is running. It can be restarted by calling the start method.
 
+#### abort
 ```javascript
 ProcessChain.abort();
 ```
 This method stops the chain and resets it to its initial empty state without calling the final function.
 
+#### complete
 ```javascript
 ProcessChain.complete();
 ```
@@ -123,43 +132,52 @@ This method stops the chain at whichever anonymous handler it is running and the
 
 # currentProcess Properties
 
+#### dataStore
 ```javascript
 currentProcess.dataStore
 ```
 A place to save things that will persist until the final anonymous handler finishes running.
 
+
 # currentProcess Methods
 
+#### uncompleted
 ```javascript
 currentProcess.uncompleted();
 ```
 This method sets an uncompleted flag on the current anonymous function being pushed into the chain. Any subsequent waits in the chain will cause the chain to stop processing until this uncompleted flag and any others has been cleared before moving on to any of the functions after the wait. To clear the flag, call the completed method. Note that the final pushed anonymous function will also wait until all uncompleted flags are cleared.
 
+#### completed
 ```javascript
 currentProcess.completed();
 ```
 This method clears the uncompleted flag of the current anonymous function being pushed into the chain. See uncompleted method for more information.
 
+#### options
 ```javascript
 currentProcess.options();
 ```
 This method returns the options of this current anonymous function set in the push method.
 
+#### stop
 ```javascript
 currentProcess.chain.stop();
 ```
 This method stops the chain at the current anonymous function. It can be restarted by calling the start method.
 
+#### start
 ```javascript
 currentProcess.chain.start();
 ```
 This method resumes the execution of the process chain where it had left off when the stop method was called.
 
+#### abort
 ```javascript
 currentProcess.chain.abort();
 ```
 This method stops the chain and resets it to its initial empty state without calling the final function.
 
+#### complete
 ```javascript
 currentProcess.chain.complete();
 ```
