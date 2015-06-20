@@ -1,5 +1,5 @@
 # ProcessChain
-In JavaScript, if you need to run multiple asyncronous calls (ie. XMLHttpRequest, AJAX, or IndexedDB) at the same time in no particular order and need a way to run another script or multiple scripts afterward, this object can help you.
+A JavaScript object that helps you manage multiple asyncronous calls. if you need to run multiple asyncronous calls (ie. XMLHttpRequest, AJAX, or IndexedDB) at the same time in no particular order and need a way to run another script or multiple scripts afterward, this object can help you.
 
 # Demo
     //Create a new ProcessChain object.
@@ -61,9 +61,9 @@ In JavaScript, if you need to run multiple asyncronous calls (ie. XMLHttpRequest
     Chain.start();
     
 
-#API
+# API
 
-#ProcessChain Functions
+# ProcessChain Functions
 
     ProcessChain.push(handler, index, options);
 This function pushes an anonymous function to be executed when the chain execution is started.
@@ -79,7 +79,7 @@ This is the same with ProcessChain.push except that it resets the ProccessChain 
     ProcessChain.final(handler);
     
 
-#currentProcess Functions
+# currentProcess Functions
 
     currentProcess.uncompleted();
 
