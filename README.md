@@ -68,32 +68,32 @@ Chain.start();
 
 #### push
 ```javascript
-ProcessChain.push(function handler, integer index, object options)
+ProcessChain.push(function handler, object options, integer index)
 ```
 This method pushes an anonymous function to be executed when the chain execution is started.
 
 | Parameters |     |     |
 | ---------- | --- | --- |
 | function | handler | (Required) An anonymous function that will be passed a currentProccess object (see details below). |
-| integer | index | (Optional) An integer index of where to insert the handler into the chain. A false boolean is passed by default denoting that the handler will be appended to the end of the chain. Please note that an integer longer than the current queue will cause the push to simply append the handler to the end of the queue. |
 | object | options | (Optional) A JavaScript object that can be used to store information to this current push. |
+| integer | index | (Optional) An integer index of where to insert the handler into the chain. A false boolean is passed by default denoting that the handler will be appended to the end of the chain. Please note that an integer longer than the current queue will cause the push to simply append the handler to the end of the queue. |
 
 #### first
 ```javascript
-ProcessChain.first(function handler, integer index, object options);
+ProcessChain.first(function handler, object options, integer index);
 ```
 This is the same with ProcessChain.push method except that it resets the ProccessChain to the initial state before pushing the handler into the chain. This gurantees that the chain is empty if the chain has been used before. This is similar to executing ProcessChain.reset and then ProcessChain.push.
 
 #### wait
 ```javascript
-ProcessChain.wait(integer index, object options);
+ProcessChain.wait(object options, integer index);
 ```
 This method appends a wait to the process chain queue. Use this after a single or group of anonymous functions pushed that have uncompleted flags set and before subsequent anonymous functions that rely on the previous functions to complete. Only after all uncompleted flags from the functions before this wait in the chain have been cleared will the process continue on to the next function in the chain.
 
 | Parameters |     |     |
 | ---------- | --- | --- |
-| integer | index | (Optional) An integer index of where to insert the wait into the chain. A false boolean is passed by default denoting that the handler will be appended to the end of the chain. Please note that an integer longer than the current queue will cause the wait to be simply appended to the end of the queue. |
 | object | options | (Optional) A JavaScript object that can be used to store information to this current wait. |
+| integer | index | (Optional) An integer index of where to insert the wait into the chain. A false boolean is passed by default denoting that the handler will be appended to the end of the chain. Please note that an integer longer than the current queue will cause the wait to be simply appended to the end of the queue. |
 
 #### final
 ```javascript
