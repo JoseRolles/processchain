@@ -1,27 +1,26 @@
 function ProcessChain()
 {
-	this.queue;
-	this.uncompleted; //stores an array of uncompleted indexes
-	this.nextProcessToStart; //stores index of next queue item
+	this.queue; //Stores the order of pushed anonymous functions
+	this.uncompleted; //Stores an array of uncompleted indexes of anonymous functions in the queue
+	this.nextProcessToStart; //Stores index of next queue item to run
 
-	this.finalHandler; //final handler
+	this.finalHandler; //Final handler to run after all uncompleted flags have been cleared
 
-	this.dataStore; //place to store data and passed to all handlers on run
+	this.dataStore; //A place to store persistent data from one anonymous function to the next
 
-	this.run;
-	this.timeoutId;
+	this.run; //Keeps track of whether start or stop have been called
+	this.timeoutId; //Keeps the most recent timeoutID set by the loop
 
-	this.startTime;
-	this.timeout;
+	this.startTime; //Time when process starts
 
-	this.reset();
+	this.reset(); //Initialize
 
-	//static
-	this.timeoutDuration = 100;
+	//Static variables
+	this.timeoutDuration = 100; //How often should we check if uncompleted flag has cleared if Asyncronous functions called
 }
 ProcessChain.prototype.reset = function()
 {
-	this.clearLoop(); //if any
+	this.clearLoop(); //Clear loop if any;
 
 	this.queue = [];
 	this.uncompleted = [];
@@ -35,15 +34,16 @@ ProcessChain.prototype.reset = function()
 	this.timeoutId = false;
 
 	this.startTime = false;
-	this.timeout = false;
 }
 ProcessChain.prototype.first = function(handler, options, index)
 {
+	//Same as push method
 	this.reset();
 	this.push(handler, options, index);
 }
 ProcessChain.prototype.push = function(handler, options, index)
 {
+	//Add a handler to the queue. Options and index are optional.
 	if (typeof handler == "function")
 	{
 		if (typeof index == "number" && index >= 0 && index < this.queue.length)
@@ -74,6 +74,7 @@ ProcessChain.prototype.push = function(handler, options, index)
 }
 ProcessChain.prototype.wait = function(options, index)
 {
+	//Add a wait to the queue. All uncompleted flags set before this wait must be cleared before the process chain can move on.
 	if (typeof index == "number" && index >= 0 && index < this.queue.length)
 	{
 		this.queue.splice(index, 0, 
@@ -93,6 +94,7 @@ ProcessChain.prototype.wait = function(options, index)
 }
 ProcessChain.prototype.final = function(handler)
 {
+	//Set the final handler to be called after all uncompleted flags have been cleared.
 	if (typeof handler == "function")
 	{
 		this.finalHandler = handler;
@@ -100,29 +102,34 @@ ProcessChain.prototype.final = function(handler)
 }
 ProcessChain.prototype.start = function()
 {
+	//Start the process chain. After pushing all anonymous functions, call this to start the chain.
 	this.startTime = new Date().getTime();
 	this.stop();
 	this.run = true;
 	this.loop();
 }
-ProcessChain.prototype.stop = function() //stops and allows continuing
+ProcessChain.prototype.stop = function()
 {
+	//Stop the process chain prematurely. To resume, call start again.
 	this.run = false;
 	this.clearLoop();
 }
-ProcessChain.prototype.abort = function() //does not call final handler, chain is reset
+ProcessChain.prototype.abort = function()
 {
+	//Stop the process chain prematurely and reset the chain to its initial state.
 	this.stop();
 	this.reset();
 }
-ProcessChain.prototype.complete = function() //calls final handler, chain is reset
+ProcessChain.prototype.complete = function()
 {
+	//Stop the process chain now, call the final handler, and reset the chain to its initial state.
 	this.stop();
 	this.finalHandler(this.dataStore);
 	this.reset();
 }
 ProcessChain.prototype.clearLoop = function()
 {
+	//Clear loop if any
 	if (this.timeoutId !== false)
 	{
 		clearTimeout(this.timeoutId);
@@ -131,6 +138,7 @@ ProcessChain.prototype.clearLoop = function()
 }
 ProcessChain.prototype.loop = function()
 {
+	//Start loop. This will run the handlers in the queue from index 0. If it encounters a wait or the it gets to the end of the queue, it will make sure all uncompleted flags have been cleared before moving on.
 	if (this.run)
 	{
 		var self = this;
@@ -141,66 +149,68 @@ ProcessChain.prototype.loop = function()
 			{
 				if (self.nextProcessToStart == self.queue.length)
 				{
+					//We are now at the end of the queue, so check if we still have uncompleted flags.
 					if (self.uncompleted.length === 0)
 					{
-						//end case
+						//End case: all uncompleted flags have been cleared.
 						self.complete();
 					}
 					else
 					{
+						//Some uncompleted flags left. Loop again.
 						self.loop();
 					}
 				}
 				else if (self.nextProcessToStart < self.queue.length)
 				{
-					//within bounds
+					//We are not at the end yet
 					while (self.run && self.nextProcessToStart < self.queue.length && (self.uncompleted.length === 0 || self.queue[self.nextProcessToStart].type != "wait"))
 					{
-						//all finished or next is not wait
+						//While no uncompleted flags or while next is not a wait
 						if (self.queue[self.nextProcessToStart].type == "process" && !self.queue[self.nextProcessToStart].called)
 						{
-							//run
-							self.queue[self.nextProcessToStart].called = true; //so we don't run again later
+							//Run
+							self.queue[self.nextProcessToStart].called = true; //Set to called status to true so we don't run again later
 
-							//callback and pass in currentProcess object
+							//Run callback and pass in currentProcess object
 							self.queue[self.nextProcessToStart].handler(
 							{
 								index: (function(index){return index;})(self.nextProcessToStart),
 								dataStore: self.dataStore,
 								chain:
 								{
-									start: function()
-									{
-										self.start();
-									},
-									stop: function()
+									stop: function() //Stops the chain
 									{
 										self.stop();
 									},
-									abort: function()
+									start: function() //Restarts the chain
+									{
+										self.start();
+									},
+									abort: function() //Stops the chain and reset chain to its initial state
 									{
 										self.abort();
 									},
-									complete: function()
+									complete: function() //Stops the chain and call the final handler
 									{
 										self.complete();
 									}
 								},
-								uncompleted: (function(index)
+								uncompleted: (function(index) //Set uncompleted flag for this anonymous function
 								{
 									return (function()
 									{
 										self.uncompleted.push(index);
 									});
 								})(self.nextProcessToStart),
-								completed: (function(index)
+								completed: (function(index) //Clear uncompleted flag for this anonymous function
 								{
 									return (function()
 									{
 										self.uncompleted.splice(self.uncompleted.indexOf(index), 1);
 									});
 								})(self.nextProcessToStart),
-								options: (function(index)
+								options: (function(index) //Get the options for this anonymous function set on push
 								{
 									return (function()
 									{
@@ -209,18 +219,18 @@ ProcessChain.prototype.loop = function()
 								})(self.nextProcessToStart)
 							});
 						}
+						//After calling handler and stop has not been called, increment to next in the queue.
 						if (self.run)
 						{
-							//advance only if still running, otherwise the following can move a pointer just reset to 0
 							self.nextProcessToStart++;
 						}
-					}
-					//recursive
+					} //End of while loop.
+					//Recursion: end of while loop so we will call itself again to check again after timeout.
 					self.loop();
 				}
 				else
 				{
-					//failed
+					//Failure, the pointer has gone beyond the last item in the queue
 					self.abort();
 					throw 'Current pointer out of bounds.';
 				}
