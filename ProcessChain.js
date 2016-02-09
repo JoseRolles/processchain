@@ -215,7 +215,7 @@ ProcessChain.prototype.loop = function()
 									return (function()
 									{
 										return self.queue[index].options;
-									});
+									})();
 								})(self.nextProcessToStart)
 							});
 						}
