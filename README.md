@@ -75,7 +75,7 @@ This method pushes an anonymous function to be executed when the chain execution
 | Parameters |     |     |
 | ---------- | --- | --- |
 | function | handler | (Required) An anonymous function that will be passed a currentProccess object (see details below). |
-| object | options | (Optional) A JavaScript object that can be used to store information to this current push. |
+| object | options | (Optional) A JavaScript object that can be used to store information to this current push. This is useful when you need to pass variables by value instead of reference. For example, when using a "for loop" to do multiple ProcessChain "pushes", relying on the for-loop variable that holds the current iteration of the loop will not work because the anonymous function will not have run until the end of the for loop so that variable will always be pointing to the final iteration count when all the anonymous funtions are ran. Passing this variable in this second parameter through the options object will ensure that when the anonymous function finally runs, the logic inside which points will be looking at the snapshot of when the variable was first passed into the ProcessChain push method parameter. |
 | integer | index | (Optional) An integer index of where to insert the handler into the chain. A false boolean is passed by default denoting that the handler will be appended to the end of the chain. Please note that an integer longer than the current queue will cause the push to simply append the handler to the end of the queue. |
 
 #### first
