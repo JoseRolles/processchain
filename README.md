@@ -1,5 +1,5 @@
 # ProcessChain
-A JavaScript object that helps you manage multiple asyncronous calls. if you need to run multiple asyncronous calls (ie. XMLHttpRequest, AJAX, or IndexedDB) at the same time in no particular order and need a way to run another script or multiple scripts afterward, this object can help you.
+A JavaScript object that helps you manage multiple asyncronous calls. If you need to run multiple asyncronous calls (ie. XMLHttpRequest, AJAX, or IndexedDB) at the same time in no particular order and need a way to run another script or multiple scripts afterward, this object can help you.
 
 # Usage Example
 ```javascript
