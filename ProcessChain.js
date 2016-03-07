@@ -53,7 +53,7 @@ ProcessChain.prototype.push = function(handler, options, index)
 				type: "process",
 				handler: handler,
 				options: options ? options : {},
-				called: false,
+				called: false
 			});
 		}
 		else
@@ -63,7 +63,7 @@ ProcessChain.prototype.push = function(handler, options, index)
 				type: "process",
 				handler: handler,
 				options: options ? options : {},
-				called: false,
+				called: false
 			});
 		}
 	}
